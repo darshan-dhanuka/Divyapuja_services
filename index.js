@@ -17,7 +17,7 @@ const connection = mysql.createConnection({
     host: 'database-1.ckyk4mp0w74m.ap-south-1.rds.amazonaws.com',
     user: 'root',
     password: 'Divyapuja1234',
-    database: ''
+    database: 'divyapuja'
 });
 connection.connect((err) => {
     if (err) throw err;
@@ -27,23 +27,28 @@ connection.connect((err) => {
 const  createUsersTable  = () => {
     const  sqlQuery  =  `
         CREATE TABLE IF NOT EXISTS users (
-        id integer PRIMARY KEY,
+        id int AUTO_INCREMENT PRIMARY KEY, 
         name text,
-        email text UNIQUE,
+        email varchar(150) UNIQUE,
         password text)`;
 
-    return  database.run(sqlQuery);
+    return  connection.query(sqlQuery, function(err, results, fields) {
+                if (err) {
+                console.log(err.message);
+                }
+            });
 }
 
 const  findUserByEmail  = (email, cb) => {
-    return  database.get(`SELECT * FROM users WHERE email = ?`,[email], (err, row) => {
+    return  connection.query(`SELECT * FROM users WHERE email = "`+email+`"`, (err, row) => {
             cb(err, row)
     });
 }
 
 const  createUser  = (user, cb) => {
-    return  database.run('INSERT INTO users (name, email, password) VALUES (?,?,?)',user, (err) => {
-        cb(err)
+    let sql = 'INSERT INTO users (name, email, password) VALUES ("'+user[0]+'","'+user[1]+'","'+user[2]+'")';
+    connection.query(sql,(err, row) => {
+        cb(err, row)
     });
 }
 
@@ -74,16 +79,18 @@ router.post('/login', (req, res) => {
     const  email  =  req.body.email;
     const  password  =  req.body.password;
     findUserByEmail(email, (err, user)=>{
+        
+        var resultArray = Object.values(JSON.parse(JSON.stringify(user)))
         if (err) return  res.status(500).send('Server error!');
-        if (!user) return  res.status(404).send('User not found!');
-        const  result  =  bcrypt.compareSync(password, user.password);
+        if (!resultArray[0]) return  res.status(404).send('User not found!');
+        const  result  =  bcrypt.compareSync(password, resultArray[0]["password"]);
         if(!result) return  res.status(401).send('Password not valid!');
 
         const  expiresIn  =  24  *  60  *  60;
-        const  accessToken  =  jwt.sign({ id:  user.id }, SECRET_KEY, {
+        const  accessToken  =  jwt.sign({ id:  resultArray[0]["id"] }, SECRET_KEY, {
             expiresIn:  expiresIn
         });
-        res.status(200).send({ "user":  user, "access_token":  accessToken, "expires_in":  expiresIn});
+        res.status(200).send({ "user":  resultArray[0], "access_token":  accessToken, "expires_in":  expiresIn});
     });
 });
 
