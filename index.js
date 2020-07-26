@@ -9,7 +9,7 @@ const cors = require('cors');
 var multer = require('multer');
 var fs = require("fs");
 
-var upload = multer({ dest: '/tmp' })
+var upload = multer({ dest: '/tmp/' })
 
 const  app  =  express();
 const  router  =  express.Router();
@@ -85,6 +85,13 @@ const  createPandit  = (user, cb) => {
     });
 }
 
+const  insertImage  = (data, cb) => {
+    let sql = 'INSERT INTO tbl_pandit_image (file_path, file_name) VALUES ("'+data[1]+'","'+data[0]["originalname"]+'")';
+    connection.query(sql,(err, row) => {
+        cb(err, row);
+    });
+}
+
 createUsersTable();
 createPanditTable();
 router.use(bodyParser.urlencoded({ extended:  false }));
@@ -150,23 +157,23 @@ router.post('/pandit_register', (req, res) => {
     });
 });
 router.post('/file_upload', upload.single("file"), function (req, res) {
-    console/log(file);
-    var file = __dirname + "/" + req.file.originalname;
+    console.log(req.file);
+    var type = req.file.mimetype;
+    var type_split =  type.split("/");
+    var file = __dirname + "/uploads/" + req.file.originalname ;
+    var response = {};
     fs.readFile( req.file.path, function (err, data) {
          fs.writeFile(file, data, function (err) {
-          if( err ){
-               console.error( err );
-               response = {
-                    message: 'Sorry, file couldn\'t be uploaded.',
-                    filename: req.file.originalname
-               };
-          }else{
+            if(err) return  res.status(500).send("Server error!");
+            insertImage([req.file,file], (err,row) => {
+                if(err) return  res.status(500).send("Server error!");
                 response = {
                     message: 'File uploaded successfully',
-                    filename: req.file.originalname
-               };
-           }
-           res.end( JSON.stringify( response ) );
+                    filename: req.file.originalname,
+                    id : row.insertId,
+                };
+                res.status(200).send({ "data":  response});
+            });
         });
     });
  })
