@@ -79,7 +79,8 @@ const  createUser  = (user, cb) => {
     });
 }
 const  createPandit  = (user, cb) => {
-    let sql = 'INSERT INTO tbl_pandit_info (pandit_name, email_id, mobile_num ,address ,city,dob ,languages_known ,experience,adhar_num , pathshala_name, pandit_cat, about ,photo_url  ) VALUES ("'+user["body"]["name"]+'","'+user["body"]["email_id"]+'","'+user["body"]["mobile_num"]+'",,"'+user["body"]["address"]+'" ,,"'+user["body"]["city"]+'","'+user["body"]["dob"]+'","'+user["body"]["languages_known"]+'","'+user["body"]["experience"]+'","'+user["body"]["adhar_num"]+'" ,"'+user["body"]["pathshala_name"]+'" ,"'+user["body"]["pandit_cat"]+'" ,"'+user["body"]["about"]+'" ,"'+user["body"]["photo_url"]+'")';
+    console.log(user["body"]);
+    let sql = 'INSERT INTO tbl_pandit_info (pandit_name, email_id, mobile_num ,address ,city,dob ,languages_known ,experience,adhar_num , pathshala_name, pandit_cat, about ,photo_url  ) VALUES ("'+user["body"]["pandit_name"]+'","'+user["body"]["email_id"]+'","'+user["body"]["mobile_num"]+'","'+user["body"]["address"]+'" ,"'+user["body"]["city"]+'","'+user["body"]["dob"]+'","'+user["body"]["languages_known"]+'","'+user["body"]["experience"]+'","'+user["body"]["adhar_num"]+'" ,"'+user["body"]["pathshala_name"]+'" ,"'+user["body"]["pandit_cat"]+'" ,"'+user["body"]["about"]+'" ,"'+user["body"]["photo_url"]+'")';
     connection.query(sql,(err, row) => {
         cb(err, row)
     });
@@ -143,7 +144,7 @@ router.get('/users', (req, res) => {
 router.get('/pandit_cat', (req, res) => {
     findPanditCat((err,result)  => {
         var resultArray = Object.values(JSON.parse(JSON.stringify(result)));
-        console.log(resultArray);
+       
         if (err) return  res.status(500).send('Server error!');
         if (!resultArray[0]) return  res.status(404).send('No data found!');
         res.status(200).send({ "data":  resultArray});
@@ -152,7 +153,6 @@ router.get('/pandit_cat', (req, res) => {
 router.post('/pandit_register', (req, res) => {
     createPandit(req, (err)=>{
         if(err) return  res.status(500).send("Server error!");
-        if (err) return  res.status(500).send('Server error!');  
         res.status(200).send({ "status":  "Registered Successfully" });
     });
 });
@@ -163,6 +163,7 @@ router.post('/file_upload', upload.single("file"), function (req, res) {
     var file = __dirname + "/uploads/" + req.file.originalname ;
     var response = {};
     fs.readFile( req.file.path, function (err, data) {
+        if(err) return  res.status(500).send("Server error!");
          fs.writeFile(file, data, function (err) {
             if(err) return  res.status(500).send("Server error!");
             insertImage([req.file,file], (err,row) => {
