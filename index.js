@@ -18,10 +18,6 @@ app.use(cors());
 const database = new sqlite3.Database("./my.db");
 const SECRET_KEY = "secretkey23456";
 
-var httpsOptions = {
-    key: fs.readFileSync('/var/www/node/server-key.pem'),
-    cert: fs.readFileSync('/var/www/node/server-cert.pem')
-};
 
 const connection = mysql.createConnection({
     host: 'database-1.ckyk4mp0w74m.ap-south-1.rds.amazonaws.com',
@@ -190,7 +186,6 @@ router.get('/', (req, res) => {
 
 app.use(router);
 const  port  =  process.env.PORT  ||  3000;
-var server = https.createServer(httpsOptions, app);
-server.listen(port, () => {
-    console.log('Server listening at https://localhost:'  +  port);
+const  server  =  app.listen(port, () => {
+    console.log('Server listening at http://localhost:'  +  port);
 }); 
