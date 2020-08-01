@@ -19,8 +19,8 @@ const database = new sqlite3.Database("./my.db");
 const SECRET_KEY = "secretkey23456";
 
 var httpsOptions = {
-    key: fs.readFileSync('/var/www/node/server.key'),
-    cert: fs.readFileSync('/var/www/node/server.cert')
+    key: fs.readFileSync('/var/www/node/server-key.pem'),
+    cert: fs.readFileSync('/var/www/node/server-cert.pem')
 };
 
 const connection = mysql.createConnection({
