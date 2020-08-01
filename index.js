@@ -8,6 +8,7 @@ const  bcrypt  =  require('bcryptjs');
 const cors = require('cors');
 var multer = require('multer');
 var fs = require("fs");
+var https = require('https');
 
 var upload = multer({ dest: '/tmp/' })
 
@@ -16,6 +17,11 @@ const  router  =  express.Router();
 app.use(cors());
 const database = new sqlite3.Database("./my.db");
 const SECRET_KEY = "secretkey23456";
+
+var httpsOptions = {
+    key: fs.readFileSync('/var/www/node/server.key'),
+    cert: fs.readFileSync('/var/www/node/server.cert')
+};
 
 const connection = mysql.createConnection({
     host: 'database-1.ckyk4mp0w74m.ap-south-1.rds.amazonaws.com',
@@ -184,6 +190,7 @@ router.get('/', (req, res) => {
 
 app.use(router);
 const  port  =  process.env.PORT  ||  3000;
-const  server  =  app.listen(port, () => {
-    console.log('Server listening at http://localhost:'  +  port);
+var server = https.createServer(httpsOptions, app);
+server.listen(port, () => {
+    console.log('Server listening at https://localhost:'  +  port);
 }); 
