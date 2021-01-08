@@ -80,6 +80,53 @@ const  createUser  = (user, cb) => {
         cb(err, row)
     });
 }
+const  editUser  = (user, cb) => {
+    let sql = 'UPDATE  users SET name = "'+user["body"]["user_name"]+'" , mobile_num = "'+user["body"]["mobile_number"]+'" WHERE email = "'+user["body"]["email_id"]+'"';
+    connection.query(sql,(err, row) => {
+        cb(err, row)
+    });
+}
+const  addAddress  = (user, cb) => {
+    let sql =  'INSERT INTO tbl_addresses ( user_id, address) VALUES ("'+user["body"]["id"]+'","'+useruser["body"]["address"]+'")';
+    connection.query(sql,(err, row) => {
+        cb(err, row)
+    });
+}
+const  getAddress  = (user,cb) => {
+    return  connection.query(`SELECT * FROM tbl_addresses WHERE user_id = "`+user["body"]["id"]+`"`, (err, row) => {
+            cb(err, row)
+    });
+}
+const  editAddress  = (user,cb) => {
+    return  connection.query(`UPDATE tbl_addresses SET address = "`+user["body"]["address"]+`" WHERE id = "`+user["body"]["address_id"]+`"`, (err, row) => {
+            cb(err, row)
+    });
+}
+const  getProducts  = (user,cb) => {
+    return  connection.query(`SELECT * FROM  tbl_products`, (err, row) => {
+            cb(err, row)
+    });
+}
+
+const  addToCart  = (user,cb) => {
+    console.log(user);
+    connection.query(`SELECT * FROM  tbl_products WHERE id = "`+user["body"]["product_id"]+`"`,(err,row) => {
+        var product_data = Object.values(JSON.parse(JSON.stringify(row)));
+    });
+    return  connection.query('INSERT INTO tbl_cart_products (product_name, product_price, product_quantity ,product_image_url ,shipping,total ,expected_delivery_date ) VALUES ("'+user["body"]["product_name"]+'","'+user["body"]["product_price"]+'","'+user["body"]["product_quantity"]+'","'+user["body"]["product_image_url"]+'" ,"'+user["body"]["shipping"]+'","'+user["body"]["total"]+'","'+user["body"]["expected_delivery_date"]+'"")', (err, row) => {
+            cb(err, row)
+    });
+}
+const  removeCart  = (user,cb) => {
+    return  connection.query(`UPDATE tbl_cart_products SET is_deleted = "1" WHERE id = "`+user["body"]["cart_id"]+`"`, (err, row) => {
+            cb(err, row)
+    });
+}
+const  showCart  = (user,cb) => {
+    return  connection.query(`SELECT * FROM  tbl_cart_products WHERE user_id = "`+user["body"]["user_id"]+`"`, (err, row) => {
+            cb(err, row)
+    });
+}
 const  createPandit  = (user, cb) => {
     console.log(user["body"]);
     let sql = 'INSERT INTO tbl_pandit_info (pandit_name, email_id, mobile_num ,address ,city,dob ,languages_known ,experience,adhar_num , pathshala_name, pandit_cat, about ,photo_url  ) VALUES ("'+user["body"]["pandit_name"]+'","'+user["body"]["email_id"]+'","'+user["body"]["mobile_num"]+'","'+user["body"]["address"]+'" ,"'+user["body"]["city"]+'","'+user["body"]["dob"]+'","'+user["body"]["languages_known"]+'","'+user["body"]["experience"]+'","'+user["body"]["adhar_num"]+'" ,"'+user["body"]["pathshala_name"]+'" ,"'+user["body"]["pandit_cat"]+'" ,"'+user["body"]["about"]+'" ,"'+user["body"]["photo_url"]+'")';
@@ -95,8 +142,6 @@ const  insertImage  = (data, cb) => {
     });
 }
 
-createUsersTable();
-createPanditTable();
 router.use(bodyParser.urlencoded({ extended:  false }));
 router.use(bodyParser.json());
 
@@ -178,6 +223,62 @@ router.post('/file_upload', upload.single("file"), function (req, res) {
                 res.status(200).send({ "data":  response});
             });
         });
+    });
+ })
+ router.post('/edit_user',  function (req, res) {
+    editUser(req, (err)=>{
+        if(err) return  res.status(500).send("Server error!");
+        res.status(200).send({ "status":  "Edited Successfully" });
+    });
+ })
+ router.post('/add_address',  function (req, res) {
+    addAddress(req, (err)=>{
+        if(err) return  res.status(500).send("Server error!");
+        res.status(200).send({ "status":  "Added Successfully" });
+    });
+ })
+ router.post('/get_address',  function (req, res) {
+    getAddress(req, (err,row)=>{
+        if(err) return  res.status(500).send("Server error!");
+        var resultArray = Object.values(JSON.parse(JSON.stringify(row)));
+        res.status(200).send({ "status":  "Fetched Successfully", "data":resultArray });
+    });
+ })
+ router.post('/edit_address',  function (req, res) {
+    editAddress(req, (err,row)=>{
+        if(err) return  res.status(500).send("Server error!");
+        var resultArray = Object.values(JSON.parse(JSON.stringify(row)));
+        res.status(200).send({ "status":  "Edited Successfully", "data":resultArray });
+    });
+ })
+
+ router.post('/get_products',  function (req, res) {
+    getProducts(req, (err,row)=>{
+        if(err) return  res.status(500).send("Server error!");
+        var resultArray = Object.values(JSON.parse(JSON.stringify(row)));
+        res.status(200).send({ "status":  "Success", "data":resultArray });
+    });
+ })
+ router.post('/add_to_cart',  function (req, res) {
+    addToCart(req, (err,row)=>{
+        if(err) return  res.status(500).send("Server error!");
+        var resultArray = Object.values(JSON.parse(JSON.stringify(row)));
+        res.status(200).send({ "status":  "Added Successfully" });
+    });
+ })
+
+ router.post('/remove_from_cart',  function (req, res) {
+    removeCart(req, (err,row)=>{
+        if(err) return  res.status(500).send("Server error!");
+        var resultArray = Object.values(JSON.parse(JSON.stringify(row)));
+        res.status(200).send({ "status":  "Removed Successfully" });
+    });
+ })
+ router.post('/show_cart',  function (req, res) {
+    showCart(req, (err,row)=>{
+        if(err) return  res.status(500).send("Server error!");
+        var resultArray = Object.values(JSON.parse(JSON.stringify(row)));
+        res.status(200).send({ "status":  "Success", "data":resultArray });
     });
  })
 router.get('/', (req, res) => {
