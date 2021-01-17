@@ -110,10 +110,7 @@ const  getProducts  = (user,cb) => {
 
 const  addToCart  = (user,cb) => {
     console.log(user);
-    connection.query(`SELECT * FROM  tbl_products WHERE id = "`+user["body"]["product_id"]+`"`,(err,row) => {
-        var product_data = Object.values(JSON.parse(JSON.stringify(row)));
-    });
-    return  connection.query('INSERT INTO tbl_cart_products (product_name, product_price, product_quantity ,product_image_url ,shipping,total ,expected_delivery_date ) VALUES ("'+user["body"]["product_name"]+'","'+user["body"]["product_price"]+'","'+user["body"]["product_quantity"]+'","'+user["body"]["product_image_url"]+'" ,"'+user["body"]["shipping"]+'","'+user["body"]["total"]+'","'+user["body"]["expected_delivery_date"]+'"")', (err, row) => {
+    return  connection.query('INSERT INTO tbl_cart_products (product_id, user_id,shipping ,expected_delivery_date ) VALUES ("'+user["body"]["product_id"]+'","'+user["body"]["user_id"]+'","'+user["body"]["shipping"]+'","'+user["body"]["expected_delivery_date"]+'"")', (err, row) => {
             cb(err, row)
     });
 }
@@ -123,7 +120,7 @@ const  removeCart  = (user,cb) => {
     });
 }
 const  showCart  = (user,cb) => {
-    return  connection.query(`SELECT * FROM  tbl_cart_products WHERE user_id = "`+user["body"]["user_id"]+`"`, (err, row) => {
+    return  connection.query(`SELECT * FROM  tbl_cart_products WHERE user_id = "`+user["body"]["user_id"]+`" AND is_deleted = "0" `, (err, row) => {
             cb(err, row)
     });
 }
