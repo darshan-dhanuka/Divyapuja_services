@@ -109,18 +109,36 @@ const  getProducts  = (user,cb) => {
 }
 
 const  addToCart  = (user,cb) => {
-    console.log(user);
-    return  connection.query('INSERT INTO tbl_cart_products (product_id, user_id,shipping ,expected_delivery_date ) VALUES ("'+user["body"]["product_id"]+'","'+user["body"]["user_id"]+'","'+user["body"]["shipping"]+'","'+user["body"]["expected_delivery_date"]+'"")', (err, row) => {
+    console.log(user['body']);
+    return  connection.query('INSERT INTO tbl_cart_products (product_id, user_id,shipping ,expected_delivery_date ) VALUES ("'+user["body"]["product_id"]+'","'+user["body"]["user_id"]+'","'+user["body"]["shipping"]+'","'+user["body"]["expected_delivery_date"]+'")', (err, row) => {
+        console.log(err);
             cb(err, row)
     });
 }
 const  removeCart  = (user,cb) => {
-    return  connection.query(`UPDATE tbl_cart_products SET is_deleted = "1" WHERE id = "`+user["body"]["cart_id"]+`"`, (err, row) => {
+    return  connection.query(`UPDATE tbl_cart_products SET is_deleted = "1" WHERE user_id = "`+user["body"]["user_id"]+`" AND product_id = "`+user["body"]["product_id"]+`"`, (err, row) => {
             cb(err, row)
     });
 }
 const  showCart  = (user,cb) => {
     return  connection.query(`SELECT * FROM  tbl_cart_products WHERE user_id = "`+user["body"]["user_id"]+`" AND is_deleted = "0" `, (err, row) => {
+            cb(err, row)
+    });
+}
+const  getUser  = (user,cb) => {
+    return  connection.query(`SELECT * FROM  users WHERE id = "`+user["body"]["user_id"]+`"`, (err, row) => {
+            cb(err, row)
+    });
+}
+const  addToPurchase  = (user,cb) => {
+    console.log(user['body']);
+    return  connection.query('INSERT INTO tbl_purchased_products (product_id, user_id,shipping ,expected_delivery_date ) SELECT product_id,user_id,shipping,expected_delivery_date FROM tbl_cart_products WHERE user_id = "'+user["body"]["user_id"]+'" AND is_deleted = 0 ', (err, row) => {
+        console.log(err);
+            cb(err, row)
+    });
+}
+const  viewPurchase  = (user,cb) => {
+    return  connection.query(`SELECT * FROM  tbl_purchased_products a LEFT JOIN tbl_products b ON a.product_id = b.id WHERE a.user_id = "`+user["body"]["user_id"]+`"`, (err, row) => {
             cb(err, row)
     });
 }
@@ -275,6 +293,30 @@ router.post('/file_upload', upload.single("file"), function (req, res) {
     showCart(req, (err,row)=>{
         if(err) return  res.status(500).send("Server error!");
         var resultArray = Object.values(JSON.parse(JSON.stringify(row)));
+        res.status(200).send({ "status":  "Success", "data":resultArray });
+    });
+ })
+ router.post('/get_user_profile',  function (req, res) {
+    getUser(req, (err,row)=>{
+        console.log(err);
+        if(err) return  res.status(500).send("Server error!");
+        var resultArray = Object.values(JSON.parse(JSON.stringify(row)));
+        if (!resultArray[0]) return  res.status(404).send('No data found!');
+        res.status(200).send({ "status":  "Success", "data":resultArray });
+    });
+ })
+ router.post('/add_to_purchase',  function (req, res) {
+    addToPurchase(req, (err,row)=>{
+        if(err) return  res.status(500).send("Server error!");
+        var resultArray = Object.values(JSON.parse(JSON.stringify(row)));
+        res.status(200).send({ "status":  "Added Successfully" });
+    });
+ })
+ router.post('/view_purchase',  function (req, res) {
+    viewPurchase(req, (err,row)=>{
+        if(err) return  res.status(500).send("Server error!");
+        var resultArray = Object.values(JSON.parse(JSON.stringify(row)));
+        if (!resultArray[0]) return  res.status(404).send('No data found!');
         res.status(200).send({ "status":  "Success", "data":resultArray });
     });
  })
