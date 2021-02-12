@@ -121,7 +121,7 @@ const  removeCart  = (user,cb) => {
     });
 }
 const  showCart  = (user,cb) => {
-    return  connection.query(`SELECT * FROM  tbl_cart_products WHERE user_id = "`+user["body"]["user_id"]+`" AND is_deleted = "0" `, (err, row) => {
+    return  connection.query(`SELECT * FROM  tbl_cart_products a LEFT JOIN tbl_products b ON a.product_id = b.id  WHERE a.user_id = "`+user["body"]["user_id"]+`" AND a.is_deleted = "0" `, (err, row) => {
             cb(err, row)
     });
 }
