@@ -322,13 +322,14 @@ router.post('/file_upload', upload.single("file"), function (req, res) {
  })
 
  router.get('/get_moonsign',  function (req, res) {
+    let data = '';
     https.get('https://api.clickastro.com/horoscope-apis/get_moonsign_prediction.php?apiKey=00ce8783-9d6a-4ca4-a509-6d5e64adbaba&reqData={"date":"20210319","moonsign":"01","lan":"ENG","scope":"D"}', (resp) => {
-        let data = '';
-        return res.status(200).send({ "status":  "Success", "data":resp });
+        data = resp;
+        return 
       }).on("error", (err) => {
         return res.status(500).send("Server error!");
       });
-
+      res.status(200).send({ "status":  "Success", "data":data });
     
  })
 router.get('/', (req, res) => {
