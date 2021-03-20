@@ -322,7 +322,7 @@ router.post('/file_upload', upload.single("file"), function (req, res) {
  })
 
  router.get('/get_moonsign',  function (req, res) {
-    console.log(req);
+    res.status(200).send({ "status":  "Success", "data":req });
  })
 router.get('/', (req, res) => {
     res.status(200).send('This is an authentication server');
