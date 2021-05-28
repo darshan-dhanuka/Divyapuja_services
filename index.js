@@ -348,6 +348,25 @@ router.get('/', (req, res) => {
 });
 
 app.use(router);
+
+// Rupesh - Make request accissible to other module
+const RoutesV1 = require('./src/api/routes/v1');
+
+// app.use(allowCrossDomain);
+app.use((req, res, next) => {
+    global.clientReq = req;
+    console.log('--- middleware called --- ')
+    next();
+});
+
+app.use(bodyParser.json({ limit: "50mb" }));
+// for parsing application/xwww-form-urlencoded
+app.use(bodyParser.urlencoded({ limit: "50mb", extended: true, parameterLimit: 50000 }));
+
+// API path for version v1
+app.use('/api/v1', RoutesV1);
+
+
 const  port  =  process.env.PORT  ||  3000;
 const  server  =  app.listen(port, () => {
     console.log('Server listening at http://localhost:'  +  port);
