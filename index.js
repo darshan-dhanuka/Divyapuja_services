@@ -19,8 +19,8 @@ const database = new sqlite3.Database("./my.db");
 const SECRET_KEY = "secretkey23456";
 
 const options = {
-    //key: fs.readFileSync("../server-key.pem"),
-    //cert: fs.readFileSync("../server-cert.pem")
+    key: fs.readFileSync("../server-key.pem"),
+    cert: fs.readFileSync("../server-cert.pem")
   };
 const connection = mysql.createConnection({
     host: 'database-1.ckyk4mp0w74m.ap-south-1.rds.amazonaws.com',
@@ -368,11 +368,11 @@ app.use(bodyParser.urlencoded({ limit: "50mb", extended: true, parameterLimit: 5
 app.use('/api/v1', RoutesV1);
 
 
-const  port  =  process.env.PORT  ||  3000;
-const  server  =  app.listen(port, () => {
-    console.log('Server listening at http://localhost:'  +  port);
-}); 
+// const  port  =  process.env.PORT  ||  3000;
+// const  server  =  app.listen(port, () => {
+//     console.log('Server listening at http://localhost:'  +  port);
+// }); 
 
-//app.listen(3000);
+app.listen(3000);
 
-//https.createServer(options, app).listen(3000);
+https.createServer(options, app).listen(3000);
