@@ -376,6 +376,7 @@ app.use('/api/v1', RoutesV1);
 //     console.log('Server listening at http://localhost:'  +  port);
 // }); 
 
-app.listen(3000);
+// keep this line commented on server too 
+// app.listen(3000);
 
 https.createServer(options, app).listen(3000);
