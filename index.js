@@ -19,8 +19,11 @@ const database = new sqlite3.Database("./my.db");
 const SECRET_KEY = "secretkey23456";
 
 const options = {
-    key: fs.readFileSync("../server-key.pem"),
-    cert: fs.readFileSync("../server-cert.pem")
+    // key: fs.readFileSync("../server-key.pem"),
+    // cert: fs.readFileSync("../server-cert.pem")
+    key: fs.readFileSync("/var/www/node/service.divyapuja.key"),
+    cert: fs.readFileSync("/var/www/node/e7a1eb6fabab4ee9.crt"),
+    ca: [fs.readFileSync("/var/www/node/gd_bundle-g2-g1.crt")]
   };
 const connection = mysql.createConnection({
     host: 'database-1.ckyk4mp0w74m.ap-south-1.rds.amazonaws.com',
