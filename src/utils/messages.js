@@ -9,9 +9,13 @@ module.exports.responseMessage = {
         passwordResetSuccessfully: 'Passwod reset successfully',
         Ok: 'Ok',        
         stateList: 'State List',
+        cartItemDeleted: 'Cart Item Deleted',
+        cartItemsList: 'List of cart items'
 
     },
     error: {
+        cartItemIdRequired: 'Cart Item Id required',
+        userIdRequired: 'User Id required',
         unauthorizedAccess: 'Unauthorized access',
         sessioExpired: 'Session expired',
         loginIncorrect: 'Login details incorrect',

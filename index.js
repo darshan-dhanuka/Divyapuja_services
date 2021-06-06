@@ -349,6 +349,7 @@ router.get('/', (req, res) => {
 
 app.use(router);
 
+global.moment = require('moment');
 // Rupesh - Make request accissible to other module
 const RoutesV1 = require('./src/api/routes/v1');
 

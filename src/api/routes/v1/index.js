@@ -3,8 +3,10 @@ const router = express.Router();
 const CartItemController = require("../../../controllers/CartItemsController");
 
 
-// router.post('/add_to_cart', validateAdminApiAccess, OrgController.validate('createOrg'), OrgController.createOrg);
-router.post('/add_to_cart', CartItemController.addCartItem);
-router.get('/get_products', CartItemController.getProduct);
+// router.post('/cart-items', validateAdminApiAccess, OrgController.validate('createOrg'), OrgController.createOrg);
+router.post('/cart-items', CartItemController.addCartItem);
+router.get('/cart-items', CartItemController.getCartItem);
+router.delete('/cart-items', CartItemController.delCartItem);
+
 
 module.exports = router;
