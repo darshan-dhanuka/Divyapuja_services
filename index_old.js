@@ -359,7 +359,7 @@ const RoutesV1 = require('./src/api/routes/v1');
 // app.use(allowCrossDomain);
 app.use((req, res, next) => {
     global.clientReq = req;
-    console.log('--- middleware called --- ')
+    console.log('--- middleware called -- ')
     next();
 });
 
