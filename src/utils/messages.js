@@ -10,7 +10,8 @@ module.exports.responseMessage = {
         Ok: 'Ok',        
         stateList: 'State List',
         cartItemDeleted: 'Cart Item Deleted',
-        cartItemsList: 'List of cart items'
+        cartItemsList: 'List of cart items',
+        prodList: 'List of products'
 
     },
     error: {
