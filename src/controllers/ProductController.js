@@ -29,7 +29,7 @@ const apiResponse = require('../utils/response');
 
 
 exports.getProduct = async (req, res) => {
-    const { prod_id } = req.query;
+    const { prod_id, url } = req.query;
     // if (typeof user_id == 'undefined') {
     //     res.apiPayload = { status: 0, message: responseMessage.error.userIdRequired, data: {} };
     //     res.statusCode = 422;
@@ -40,7 +40,7 @@ exports.getProduct = async (req, res) => {
     //     return apiResponse.clientResponse(res);
     // }
 
-    productModel.getProducts(prod_id)
+    productModel.getProducts(url)
         .then(products => {
             if (!products) {
                 res.apiPayload = { status: 0, message: responseMessage.error.tryAgain, data: {} };
