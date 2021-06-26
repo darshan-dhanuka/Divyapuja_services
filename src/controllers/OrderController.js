@@ -20,27 +20,27 @@ exports.placeOrder = async (req, res) => {
         console.log('options => ', options);
         let orderDetails = await placeOrderOnRazorPay(options);
         console.log('orderDetails => ', orderDetails);
-        // if (orderDetails) {
-        //     let orderPlaced = await this.addOrder(this.req.body, orderDetails);
-        //     if (orderPlaced && orderPlaced.length) {
-        //         res.apiPayload = { status: 1, message: responseMessage.success.orderDetails, data: { orderDetails } };
-        //         res.statusCode = 200;
-        //         return apiResponse.clientResponse(res);
-        //     } else {
-        //         res.apiPayload = { status: 0, message: responseMessage.error.tryAgain, data: {} };
-        //         res.statusCode = 422;
-        //         return apiResponse.clientResponse(res);
-        //     }
+        if (orderDetails) {
+            let orderPlaced = await addOrder(req.body, orderDetails);
+            if (orderPlaced && orderPlaced.length) {
+                res.apiPayload = { status: 1, message: 'order details', data: orderDetails };
+                res.statusCode = 200;
+                return apiResponse.clientResponse(res);
+            } else {
+                res.apiPayload = { status: 0, message: responseMessage.error.tryAgain, data: {} };
+                res.statusCode = 422;
+                return apiResponse.clientResponse(res);
+            }
 
-        // } else {
-        //     res.apiPayload = { status: 0, message: responseMessage.error.tryAgain, data: {} };
-        //     res.statusCode = 422;
-        //     return apiResponse.clientResponse(res);
-        // }
+        } else {
+            res.apiPayload = { status: 0, message: responseMessage.error.tryAgain, data: {} };
+            res.statusCode = 422;
+            return apiResponse.clientResponse(res);
+        }
 
-        res.apiPayload = { status: 1, message: 'order details', data: { orderDetails } };
-        res.statusCode = 200;
-        return apiResponse.clientResponse(res);
+        // res.apiPayload = { status: 1, message: 'order details', data: { orderDetails } };
+        // res.statusCode = 200;
+        // return apiResponse.clientResponse(res);
 
     } catch (err) {
         res.apiPayload = { status: 0, message: "Exception : " + err, data: {} };
@@ -109,63 +109,68 @@ function placeOrderOnRazorPay(options) {
 * @param {*} body  Request Body
 * @param {*} orderDetails Order details with order id
 */
-// function addOrder(body, orderDetails) {
-//     const { customer_id, order_items, grand_total, cust_address_id, order_note, order_date } = body;
-//     const { id, receipt } = orderDetails;
+const addOrder = async(body, orderDetails) => {
+    const { user_id, order_items, grand_total, user_address_id, order_note, delivery_date, name, last_name, email, mobile_num, user_street, user_appartment, user_city, user_state, user_postcode, user_country, company } = body;
+    const { id, receipt } = orderDetails;
 
-//     let promiseArray = [];
-//     let groceryOrderObj = {
-//         customer_id: customer_id,
-//         order_id: id,
-//         receipt_no: receipt,
-//         cust_address_id: cust_address_id,
-//         payment_status: 0,
-//         order_note: order_note,
-//         tax_amt: 0,
-//         shipping_amt: 0,
-//         grand_total: grand_total,
-//         order_status: 'pending',
-//         order_date: order_date,
-//         created_at: this.getCurrentDate()
-//     }
+    let promiseArray = [];
+    let OrderObj = {
+        user_id: user_id,
+        order_id: id,
+        receipt_no: receipt,
+        user_address_id: user_address_id,
+        payment_status: 0,
+        order_note: order_note,
+        tax_amt: 0,
+        shipping_amt: 0,
+        grand_total: grand_total,
+        order_status: 'pending',
+        delivery_date: delivery_date,
+        payment_method: 'razorpay',
+        created_at: moment().format('YYYY-MM-DD hh:mm:ss')
+    }
 
-//     // Return order id from here to insert order items in order_items table
-//     let orderResultArr = await this.GroceryOrderModel.addGroceryOrderPayment(groceryOrderObj);
-//     if (orderResultArr) {
+    // Return order id from here to insert order items in order_items table
+    let orderResultArr = await orderModel.OrderPayment(OrderObj);
+    console.log(' order payment data saved ')
+    if (orderResultArr) {
+        try {
+            console.log(' in try ')
+            promiseArray.push(orderResultArr);
+            // Insert multiple order items into order_items table agains order id      
+            let orderItemsDetails = typeof (order_items) === 'string' ? JSON.parse(order_items) : order_items;
+            for (let item of orderItemsDetails) {
+                let dataObj = {
+                    order_id: orderResultArr[0],
+                    product_id: item.product_id,
+                    price: item.price,
+                    qty: item.qty,
+                    sub_total: parseFloat(item.price) * item.qty,
+                    created_at: moment().format('YYYY-MM-DD hh:mm:ss')
+                }
+                promiseArray.push(await orderModel.addOrderItems(dataObj));
+            }
+            console.log(' in try after for ')
+            return Promise.all(promiseArray)
+                .then(result => {
+                    console.log(' in try from promise ')
+                    return result;
+                }).catch(err => {
+                    console.log(' in promise catch ')
+                    return false;
+                })
 
-//         try {
+        } catch (err) {
+            console.log(' in addOrder catch ')
+            return false;
+        }
 
-//             promiseArray.push(orderResultArr);
-//             // Insert multiple order items into order_items table agains order id      
-//             let orderItemsDetails = typeof (order_items) === 'string' ? JSON.parse(order_items) : order_items;
-//             for (let item of orderItemsDetails) {
-//                 let dataObj = {
-//                     order_id: orderResultArr[0],
-//                     product_id: item.product_id,
-//                     price: item.price,
-//                     qty: item.qty,
-//                     sub_total: parseFloat(item.price) * item.qty,
-//                     created_at: this.getCurrentDate(),
-//                 }
-//                 promiseArray.push(await this.GroceryOrderModel.addOrderItems(dataObj));
-//             }
+    } else {
+        console.log(' in addOrder outer else ')
+        return false;
+    }
 
-//             return Promise.all(promiseArray)
-//                 .then(result => {
-//                     return result;
-//                 }).catch(err => {
-//                     return false;
-//                 })
-
-//         } catch (err) {
-//             return false;
-//         }
-
-//     } else {
-//         return false;
-//     }
-
-// }
+}
 
 exports.updateOrder = async (req, res) => {
 

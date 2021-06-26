@@ -18,5 +18,58 @@ module.exports.getPaymentLastId = () => {
       return false;
     });
 }
+
+module.exports.OrderPayment = (dataObj) => {
+  console.log("from orderPayment")
+
+  let addKeyValues = DbInstance.formAddQuery(dataObj);
+  console.log("addKeyValues :: " + addKeyValues)
+  let keys = addKeyValues.keys.substring(1, addKeyValues.keys.length);
+  console.log("keys :: " + keys)
+  let values = addKeyValues.values.substring(1, addKeyValues.values.length);
+  console.log("values :: " + values)
+
+  let query = ` INSERT INTO tbl_orders (
+    ${keys}
+) VALUES (${values})`;
+  console.log("query :: " + query)
+  return sequelize.query(query, {
+    bind: dataObj,
+    type: 'INSERT'
+  }).then(async result => {
+    console.log('order payment success ')
+    return result;
+  }).catch(error => {
+    console.log('err from model ' + error)
+    return false;
+  });
+}
+
+module.exports.addOrderItems = (dataObj) => {
+  console.log("from addOrderItems")
+
+  let addKeyValues = DbInstance.formAddQuery(dataObj);
+  console.log("addKeyValues :: " + addKeyValues)
+  let keys = addKeyValues.keys.substring(1, addKeyValues.keys.length);
+  console.log("keys :: " + keys)
+  let values = addKeyValues.values.substring(1, addKeyValues.values.length);
+  console.log("values :: " + values)
+
+  let query = ` INSERT INTO tbl_order_items (
+    ${keys}
+) VALUES (${values})`;
+  console.log("query :: " + query)
+  return sequelize.query(query, {
+    bind: dataObj,
+    type: 'INSERT'
+  }).then(async result => {
+    return result;
+  }).catch(error => {
+    console.log('err from model ' + error)
+    return false;
+  });
+}
+
+
   
 // module.exports.cartItemModel = cartItemModel;
