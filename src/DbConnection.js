@@ -46,6 +46,16 @@ class DbConnection {
     return addKeyValuesObj;
   }
 
+  formUpdateQuery(requestObj) {
+    let updateColumn = '';
+    Object.entries(requestObj).map(([key, value]) => {
+      if (key === 'id' || typeof value === 'undefined') return;
+      updateColumn = updateColumn + ` ${key} = "${value}",`;
+    });
+    updateColumn = updateColumn.slice(0, -1);
+    return updateColumn;
+  }
+
 }
 
 module.exports = new DbConnection();

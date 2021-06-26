@@ -17,6 +17,6 @@ router.get('/products', ProductController.getProduct);
 router.post('/orders', OrderController.placeOrder);
 // router.get('/orders', OrdersController.getOrders);
 // To update payment details in order table
-// router.put('/orders', OrderController.updateOrder);
+router.put('/orders', OrderController.updateOrder);
 
 module.exports = router;

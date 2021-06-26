@@ -173,7 +173,35 @@ const addOrder = async(body, orderDetails) => {
 }
 
 exports.updateOrder = async (req, res) => {
+    const { payment_details } = req.body;
 
+    let paymentDetails = JSON.parse(payment_details);
+
+    let dataObj = {
+      payment_id: paymentDetails.payment_id ? paymentDetails.payment_id : null,
+      order_id: paymentDetails.order_id ? paymentDetails.order_id : null,
+      razorpay_signature: paymentDetails.signature ? paymentDetails.signature : null,
+      payment_status: paymentDetails.status ? paymentDetails.status : null,
+      updated_at: moment().format('YYYY-MM-DD hh:mm:ss')
+    }
+
+    orderModel.updateOrderByOrderId(dataObj)
+        .then(result => {
+            if (!result) {
+                res.apiPayload = { status: 0, message: responseMessage.error.tryAgain, data: {} };
+                res.statusCode = 422;
+                return apiResponse.clientResponse(res);
+            } else {
+                res.apiPayload = { status: 1, message: 'Payment suceess', data: {} };
+                res.statusCode = 200;
+                return apiResponse.clientResponse(res);
+            }
+            
+        }).catch(next => {
+            res.apiPayload = { status: 0, message: "Exception : " + next.message, data: {} };
+            res.statusCode = 409;
+            return apiResponse.clientResponse(res);
+        });
 }
 
 exports.getOrders = async (req, res) => {

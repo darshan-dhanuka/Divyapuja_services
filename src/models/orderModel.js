@@ -70,6 +70,22 @@ module.exports.addOrderItems = (dataObj) => {
   });
 }
 
+module.exports.updateOrderByOrderId = (dataObj) => {
+  let updateColumn = DbInstance.formUpdateQuery(dataObj);
 
+    let query = `UPDATE tbl_orders 
+  SET 
+      `+ updateColumn + `
+  WHERE  
+    order_id="${dataObj.order_id}"`;
+
+    return sequelize.query(query, {
+      type: 'UPDATE'
+    }).then(async result => {
+      return result;
+    }).catch(error => {
+      return false;
+    });
+}
   
 // module.exports.cartItemModel = cartItemModel;
