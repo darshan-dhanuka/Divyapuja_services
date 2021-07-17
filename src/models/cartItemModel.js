@@ -55,7 +55,7 @@ module.exports.getCartItems = (user_id) => {
     whrCondition = `where user_id = ${user_id}`;
   }
 
-  let query = `SELECT * FROM  tbl_cart_products a LEFT JOIN tbl_products b ON a.product_id = b.id ${whrCondition} AND a.is_deleted = "0"`
+  let query = `SELECT a.id as id, a.user_id as user_id, b.id as product_id, a.shipping as shipping, a.expected_delivery_date as expected_delivery_date, a.is_deleted as item_deleted, a.qty as qty, b.product_name as product_name, b.url as url, b.product_price as product_price, b.product_quantity as product_quantity, b.product_image_url as product_image_url, b.quantity_available as quantity_available, b.is_deleted as prod_disabled, b.brand as brand, key_feature, b.description as description, benefits, vedic_astro_accociations, cat_id, short_desc FROM  tbl_cart_products a LEFT JOIN tbl_products b ON a.product_id = b.id ${whrCondition} AND a.is_deleted = "0"`
   // let query = `SELECT 
   //                     CI.id AS id,
   //                     CI.customer_id AS customer_id,

@@ -109,7 +109,7 @@ exports.getCartItem = async (req, res) => {
 }
 
 exports.delCartItem = async (req, res) => {
-    const { id } = req.body;
+    const { id } = req.query;
     if (typeof id == 'undefined') {
         res.apiPayload = { status: 0, message: responseMessage.error.cartItemIdRequired, data: {} };
         res.statusCode = 422;
