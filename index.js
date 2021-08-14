@@ -356,12 +356,22 @@ global.moment = require('moment');
 // Rupesh - Make request accissible to other module
 const RoutesV1 = require('./src/api/routes/v1');
 
-// app.use(allowCrossDomain);
+const allowCrossDomain = (req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,UPDATE');
+    res.header('Access-Control-Allow-Headers', '*');
+    res.header('Access-Control-Allow-Credentials', true);
+
+    next();
+}
+
 app.use((req, res, next) => {
     global.clientReq = req;
     console.log('--- middleware called -- ')
     next();
 });
+
+app.use(allowCrossDomain);
 
 app.use(bodyParser.json({ limit: "50mb" }));
 // for parsing application/xwww-form-urlencoded
