@@ -22,7 +22,7 @@ const options = {
     // key: fs.readFileSync("../server-key.pem"),
     // cert: fs.readFileSync("../server-cert.pem")
     key: fs.readFileSync("/var/www/node/service.divyapuja.key"),
-    cert: fs.readFileSync("/var/www/node/e7a1eb6fabab4ee9.crt"),
+    cert: fs.readFileSync("/var/www/node/bb8d47ec060edfe0.crt"),
     ca: [fs.readFileSync("/var/www/node/gd_bundle-g2-g1.crt")]
   };
 const connection = mysql.createConnection({
@@ -385,6 +385,8 @@ app.use('/api/v1', RoutesV1);
 // const  server  =  app.listen(port, () => {
 //     console.log('Server listening at http://localhost:'  +  port);
 // }); 
+
+//app.listen(3000);
 
 // keep this line commented on server too 
 // app.listen(3000);
